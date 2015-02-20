@@ -11,4 +11,7 @@
                  [ring "1.3.2"]]
   :main ^:skip-aot markov-text.cli
   :target-path "target/%s"
-  :profiles {:uberjar {:aot :all}})
+  :profiles {:uberjar {:aot :all}}
+  :plugins [[lein-ring "0.9.1"]]
+  :ring {:handler markov-text.web/markov
+         :init markov-text.web/init})
