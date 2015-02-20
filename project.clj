@@ -6,7 +6,9 @@
                  [org.clojure/java.jdbc "0.3.6"]
                  [org.postgresql/postgresql "9.3-1103-jdbc4"]
                  [com.h2database/h2 "1.3.170"]
-                 [org.clojure/tools.cli "0.3.1"]]
-  :main ^:skip-aot markov-text.core
+                 [org.clojure/tools.cli "0.3.1"]
+                 [compojure "1.3.2"]
+                 [ring "1.3.2"]]
+  :main ^:skip-aot markov-text.cli
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})

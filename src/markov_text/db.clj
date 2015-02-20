@@ -42,6 +42,10 @@
                       direction-enum-ddl
                       connections-table-ddl))
 
+(defn clear-db
+  [db-uri]
+  (sql/db-do-commands db-uri "TRUNCATE tokens, ngrams, connections"))
+
 (defn add-ngram
   [db-spec token-records]
   (let [token-columns (take (count token-records) ngram-token-column-names)]
@@ -81,14 +85,12 @@
                ["id = ?" (:id connection-record)]))
 
 (defn get-token-by-text [db-spec token]
-  (sql/query db-spec ["SELECT id FROM tokens WHERE text = ?" token]))
+  (first (sql/query db-spec ["SELECT * FROM tokens WHERE text = ?" token])))
 
 (defn get-ngram-by-tokens [db-spec token-records]
   (let [token-columns (take (count token-records) ngram-token-column-names)
-        columns (concat ["id"] token-columns ["count"])
-        select-clause (string/join ", " columns)
         where-clause (string/join " and " (map #(str % " = ?") token-columns))]
-    (apply sql/query db-spec (string/join " " ["SELECT" select-clause "FROM ngrams WHERE" where-clause]) (map #(get % :id) token-records))))
+    (first (apply sql/query db-spec (string/join " " ["SELECT * FROM ngrams WHERE" where-clause]) (map #(get % :id) token-records)))))
 
 (defn get-connection-by-ngram-token-dir [db-spec ngram-record token-record direction]
-  (sql/query db-spec "SELECT id FROM connections WHERE ngram = ? and token = ? and direction = ?" (:id ngram-record) (:id token-record) direction))
+  (first (sql/query db-spec "SELECT * FROM connections WHERE ngram = ? and token = ? and direction = ?" (:id ngram-record) (:id token-record) direction)))
