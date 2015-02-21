@@ -6,7 +6,6 @@
                  [clj-yaml "0.4.0"]
                  [compojure "1.3.2"]
                  [ring "1.3.2"]
-                 [sqlingvo "0.7.8"]
                  [org.clojure/java.jdbc "0.3.6"]
                  [org.postgresql/postgresql "9.3-1103-jdbc4"]]
   :main ^:skip-aot markov-text.cli
