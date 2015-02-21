@@ -25,21 +25,25 @@
 (def direction-enum-ddl
   "CREATE TYPE direction AS ENUM ('next', 'prev')")
 
-(def connections-table-ddl
+(defn connections-table-ddl
+  [postgres?]
   (sql/create-table-ddl :connections
                         [:id :serial "PRIMARY KEY"]
-                        [:direction :direction "NOT NULL"]
+                        (if postgres?
+                          [:direction :direction "NOT NULL"]
+                          [:direction :text "NOT NULL"])
                         [:ngram :serial "NOT NULL" "references ngrams (id)"]
                         [:token :serial "NOT NULL" "references tokens (id)"]
                         [:count :integer "NOT NULL" "DEFAULT 1"]
                         ["UNIQUE" "(direction, ngram, token)"]))
 
 (defn init-db
-  [db-spec ngram-size]
+  [db-spec ngram-size {:keys [postgres?] :or {postgres? true}}]
   (apply sql/db-do-commands db-spec (remove nil? [token-table-ddl
                                                   (ngram-table-ddl ngram-size)
-                                                  direction-enum-ddl
-                                                  connections-table-ddl])))
+                                                  (if postgres?
+                                                    direction-enum-ddl)
+                                                  (connections-table-ddl postgres?)])))
 
 (defn clear-db
   [db-spec]

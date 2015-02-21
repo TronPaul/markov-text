@@ -12,9 +12,9 @@
 (defn dev-init []
   "lein-ring dev setup"
   (dosync
-    (ref-set db-spec "jdbc:sqlite:")
+    (ref-set db-spec "sqlite::memory:")
     (alter config merge (util/read-config)))
-  (db/init-db @db-spec (:ngram-size @config)))
+  (db/init-db @db-spec (:ngram-size @config) {:postgres? false}))
 
 (defroutes markov
            (POST "/line" [line]
