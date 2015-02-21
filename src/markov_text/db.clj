@@ -35,16 +35,15 @@
                         ["UNIQUE" "(direction, ngram, token)"]))
 
 (defn init-db
-  [db-uri ngram-size]
-  (sql/db-do-commands db-uri
-                      token-table-ddl
-                      (ngram-table-ddl ngram-size)
-                      direction-enum-ddl
-                      connections-table-ddl))
+  [db-spec ngram-size]
+  (apply sql/db-do-commands db-spec (remove nil? [token-table-ddl
+                                                  (ngram-table-ddl ngram-size)
+                                                  direction-enum-ddl
+                                                  connections-table-ddl])))
 
 (defn clear-db
-  [db-uri]
-  (sql/db-do-commands db-uri "TRUNCATE tokens, ngrams, connections"))
+  [db-spec]
+  (sql/db-do-commands db-spec "TRUNCATE tokens, ngrams, connections"))
 
 (defn add-ngram
   [db-spec token-records]
@@ -73,8 +72,8 @@
   [db-spec ngram-record token-record direction]
   (sql/insert! db-spec
                :connections
-               {:ngram (:id ngram-record)
-                :token (:id token-record)
+               {:ngram     (:id ngram-record)
+                :token     (:id token-record)
                 :direction direction}))
 
 (defn inc-connection

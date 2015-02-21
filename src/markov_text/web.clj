@@ -1,14 +1,21 @@
 (ns markov-text.web
   (:use compojure.core
         ring.adapter.jetty)
-  (:require [markov-text.core :as core]))
+  (:require [markov-text.core :as core]
+            [markov-text.util :as util]
+            [markov-text.db :as db]))
 
 (def config (ref {}))
 
-(defn init []
+(def db-spec (ref {:name "jdbc/MarkovDS"}))
+
+(defn dev-init []
+  "lein-ring dev setup"
   (dosync
-    (alter config merge (core/read-config))))
+    (ref-set db-spec "jdbc:sqlite:")
+    (alter config merge (util/read-config)))
+  (db/init-db @db-spec (:ngram-size @config)))
 
 (defroutes markov
            (POST "/line" [line]
-             (core/add-line db-uri ngram-size line)))
+             (core/add-line @db-spec (:ngram-size @config) line)))
